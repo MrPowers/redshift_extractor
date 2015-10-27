@@ -35,7 +35,7 @@ module RedshiftExtractor; describe Extractor do
       }
 
       extractor = Extractor.new(args)
-      extractor.unloader
+      extractor.send(:unloader)
     end
   end
 

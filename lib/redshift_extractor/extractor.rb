@@ -15,6 +15,8 @@ module RedshiftExtractor; class Extractor
     copy
   end
 
+  private
+
   def unloader
     Unload.new(
       aws_access_key_id: config.aws_access_key_id,
@@ -48,12 +50,11 @@ module RedshiftExtractor; class Extractor
   end
 
   def destination_connection
-    PGconn.connect(database_config_destination)
+    PGconn.connect(config.database_config_destination)
   end
 
   def source_connection
-    PGconn.connect(database_config_source)
+    PGconn.connect(config.database_config_source)
   end
 
 end; end
-
