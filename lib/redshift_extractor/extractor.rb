@@ -30,8 +30,11 @@ module RedshiftExtractor; class Extractor
     source_connection.exec(unloader.unload_sql)
   end
 
+  def dropper
+    Drop.new(table_name: config.table_name)
+  end
+
   def drop
-    dropper = Drop.new(table_name: config.table_name)
     destination_connection.exec(dropper.drop_sql)
   end
 
@@ -39,13 +42,16 @@ module RedshiftExtractor; class Extractor
     destination_connection.exec(config.create_sql)
   end
 
-  def copy
-    copier = Copy.new(
+  def copier
+    Copy.new(
       aws_access_key_id: config.aws_access_key_id,
       aws_secret_access_key: config.aws_secret_access_key,
-      data_source: config.copy_data_source,
+      copy_data_source: config.copy_data_source,
       table_name: config.table_name
     )
+  end
+
+  def copy
     destination_connection.exec(copier.copy_sql)
   end
 
