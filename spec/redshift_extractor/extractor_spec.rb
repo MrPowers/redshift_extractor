@@ -30,7 +30,24 @@ module RedshiftExtractor; describe Extractor do
 
   context "#unloader" do
     it "instantiates an Unload object" do
-      expect(extractor.send(:unloader)).to be_instance_of(Unload)
+      args = {
+        s3_destination: "unload_s3_destination",
+        select_sql: "unload_select_sql",
+        aws_access_key_id: "aws_access_key_id",
+        aws_secret_access_key: "aws_secret_access_key"
+      }
+      expect(Unload).to receive(:new).with(args)
+      extractor.send(:unloader)
+    end
+  end
+
+  context "#unload" do
+    it "runs the unload_sql in the database" do
+      source_connection = double
+      expect(extractor).to receive(:source_connection).and_return(source_connection)
+      expected_sql = "UNLOAD('unload_select_sql') to 'unload_s3_destination' CREDENTIALS 'aws_access_key_id=aws_access_key_id;aws_secret_access_key=aws_secret_access_key' MANIFEST GZIP ADDQUOTES ESCAPE;"
+      expect(source_connection).to receive(:exec).with expected_sql
+      extractor.send(:unload)
     end
   end
 

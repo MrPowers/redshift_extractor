@@ -10,7 +10,8 @@ module RedshiftExtractor; class Unload
   end
 
   def unload_sql
-    "UNLOAD('#{escaped_extract_sql}') to '#{s3_destination}' CREDENTIALS '#{credentials}' MANIFEST GZIP ADDQUOTES ESCAPE;"
+    "UNLOAD('#{escaped_extract_sql}') to '#{s3_destination}'"\
+    " CREDENTIALS '#{credentials}' MANIFEST GZIP ADDQUOTES ESCAPE;"
   end
 
   def escaped_extract_sql

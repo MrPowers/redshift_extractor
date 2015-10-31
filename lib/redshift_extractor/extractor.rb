@@ -46,7 +46,7 @@ module RedshiftExtractor; class Extractor
     Copy.new(
       aws_access_key_id: config.aws_access_key_id,
       aws_secret_access_key: config.aws_secret_access_key,
-      copy_data_source: config.copy_data_source,
+      data_source: config.copy_data_source,
       table_name: config.table_name
     )
   end
