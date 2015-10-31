@@ -1,16 +1,20 @@
 # RedshiftExtractor
 
-redshift_extractor moves data from one Amazon Redshift cluster to another.  Here is how the data is moved:
+redshift_extractor moves data from one Amazon Redshift cluster to another.  Here is how it works:
 
-1. [UNLOAD](http://docs.aws.amazon.com/redshift/latest/dg/r_UNLOAD.html) - runs a query and stores and results in CSV files in S3.
+- Source database
 
-2. Drop - Drops a database table if it already exists.
+  1. [UNLOAD](http://docs.aws.amazon.com/redshift/latest/dg/r_UNLOAD.html) - runs a SELECT query and exports the results to CSV files in S3.
 
-3. Create - Creates a database table.
+- Destination database
 
-4. [COPY](http://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html) - Loads data from S3 into a Redshift database.
+  2. Drop - Drops a database table (the table in the destination database where the data will be stored).
 
-One database connection is established with the source database to UNLOAD the data to S3.  After the data is UNLOADed, a second database connection is establed with the destination database to drop/create the database table that will store the data and to COPY the data from the S3 files to the destination table.
+  3. Create - Creates a database table.
+
+  4. [COPY](http://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html) - Loads data from S3 into a Redshift database.
+
+One database connection is established with the source database to UNLOAD the data to S3.  After the data is UNLOADed, a second database connection is establed with the destination database to drop/create the database table that will store the data.  The final step is to COPY the data from the S3 files to the destination table.
 
 ## Running the Code
 
@@ -35,9 +39,20 @@ extractor.run
 
 Here is a description of the parameters:
 
-- database_config_source: A hash that's acceptable for the [Ruby Postgres gem](https://bitbucket.org/ged/ruby-pg/wiki/Home)
+- database_config_source: A hash that's acceptable for the [Ruby Postgres gem](https://bitbucket.org/ged/ruby-pg/wiki/Home).  Here's an example:
 
-- unload_s3_destination: A S3 path, something like "s3://bucket_name/something_else/"
+```ruby
+{
+  dbname: "db_name",
+  user: "username",
+  password: "password",
+  host: "host",
+  sslmode: 'require',
+  port: 5439
+}
+```
+
+- unload_s3_destination: A S3 path, something like `"s3://bucket_name/something_else/"`
 
 - unload_select_sql: A SQL SELECT query that will be run on the source table
 
