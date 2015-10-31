@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-  module RedshiftExtractor; describe Extractor do
+module RedshiftExtractor; describe Extractor do
 
   let(:extractor) do
     args = {
