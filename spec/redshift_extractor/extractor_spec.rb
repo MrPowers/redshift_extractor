@@ -1,41 +1,36 @@
 require 'spec_helper'
 
-module RedshiftExtractor; describe Extractor do
+  module RedshiftExtractor; describe Extractor do
 
-  context ".new" do
-    it "can be instantiated without blowing up" do
-      args = {
-        database_config_source: "something",
-        database_config_destination: "something",
-        unload_s3_destination: "something",
-        unload_select_sql: "something",
-        table_name: "something",
-        create_sql: "something",
-        copy_data_source: "something",
-        aws_access_key_id: "something",
-        aws_secret_access_key: "something"
-      }
+  let(:extractor) do
+    args = {
+      database_config_source: "database_config_source",
+      database_config_destination: "database_config_destination",
+      unload_s3_destination: "unload_s3_destination",
+      unload_select_sql: "unload_select_sql",
+      table_name: "table_name",
+      create_sql: "create_sql",
+      copy_data_source: "copy_data_source",
+      aws_access_key_id: "aws_access_key_id",
+      aws_secret_access_key: "aws_secret_access_key"
+    }
 
-      Extractor.new(args)
+    Extractor.new(args)
+  end
+
+  context "#run" do
+    it "unloads the data, drops the table, recreates the table, and copys the data" do
+      expect(extractor).to receive(:unload).ordered
+      expect(extractor).to receive(:drop).ordered
+      expect(extractor).to receive(:create).ordered
+      expect(extractor).to receive(:copy).ordered
+      extractor.run
     end
   end
 
   context "#unloader" do
     it "instantiates an Unload object" do
-      args = {
-        database_config_source: "something",
-        database_config_destination: "something",
-        unload_s3_destination: "something",
-        unload_select_sql: "something",
-        table_name: "something",
-        create_sql: "something",
-        copy_data_source: "something",
-        aws_access_key_id: "something",
-        aws_secret_access_key: "something"
-      }
-
-      extractor = Extractor.new(args)
-      extractor.send(:unloader)
+      expect(extractor.send(:unloader)).to be_instance_of(Unload)
     end
   end
 
