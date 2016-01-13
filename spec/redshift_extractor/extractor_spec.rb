@@ -8,7 +8,8 @@ module RedshiftExtractor; describe Extractor do
       database_config_destination: "database_config_destination",
       unload_s3_destination: "unload_s3_destination",
       unload_select_sql: "unload_select_sql",
-      table_name: "table_name",
+      destination_schema: "destination_schema",
+      destination_table: "destination_table",
       create_sql: "create_sql",
       copy_data_source: "copy_data_source",
       aws_access_key_id: "aws_access_key_id",
@@ -53,7 +54,7 @@ module RedshiftExtractor; describe Extractor do
 
   context "#dropper" do
     it "instantiates a Drop object" do
-      args = {table_name: "table_name"}
+      args = {destination_schema: "destination_schema", destination_table: "destination_table"}
       expect(Drop).to receive(:new).with(args)
       extractor.send(:dropper)
     end
@@ -63,7 +64,7 @@ module RedshiftExtractor; describe Extractor do
     it "runs the drop_sql in the database" do
       destination_connection = double
       expect(extractor).to receive(:destination_connection).and_return(destination_connection)
-      expected_sql = "drop table if exists table_name;"
+      expected_sql = "drop table if exists destination_schema.destination_table;"
       expect(destination_connection).to receive(:exec).with expected_sql
       extractor.send(:drop)
     end
@@ -83,7 +84,8 @@ module RedshiftExtractor; describe Extractor do
     it "instantiates an Copy object" do
       args = {
         data_source: "copy_data_source",
-        table_name: "table_name",
+        destination_schema: "destination_schema",
+        destination_table: "destination_table",
         aws_access_key_id: "aws_access_key_id",
         aws_secret_access_key: "aws_secret_access_key"
       }
@@ -96,7 +98,7 @@ module RedshiftExtractor; describe Extractor do
     it "runs the copy sql command" do
       destination_connection = double
       expect(extractor).to receive(:destination_connection).and_return(destination_connection)
-      expected_sql = "copy table_name from 'copy_data_source' credentials 'aws_access_key_id=aws_access_key_id;aws_secret_access_key=aws_secret_access_key' manifest dateformat 'auto' timeformat 'auto' blanksasnull emptyasnull escape gzip removequotes delimiter '|';"
+      expected_sql = "copy destination_schema.destination_table from 'copy_data_source' credentials 'aws_access_key_id=aws_access_key_id;aws_secret_access_key=aws_secret_access_key' manifest dateformat 'auto' timeformat 'auto' blanksasnull emptyasnull escape gzip removequotes delimiter '|';"
       expect(destination_connection).to receive(:exec).with expected_sql
       extractor.send(:copy)
     end

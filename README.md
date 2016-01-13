@@ -18,7 +18,7 @@ One database connection is established with the source database to UNLOAD the da
 
 ## Running the Code
 
-The RedshiftExtractor::Extractor class is instantiated with a long hash of arguments.
+The `RedshiftExtractor::Extractor` class is instantiated with a long hash of arguments ([sorry Sandi Metz!](https://robots.thoughtbot.com/sandi-metz-rules-for-developers)).
 
 ```ruby
 args = {
@@ -26,7 +26,8 @@ args = {
   database_config_destination: "database_config_destination",
   unload_s3_destination: "unload_s3_destination",
   unload_select_sql: "unload_select_sql",
-  table_name: "table_name",
+  destination_schema: "destination_schema",
+  destination_table: "destination_table",
   create_sql: "create_sql",
   copy_data_source: "copy_data_source",
   aws_access_key_id: "aws_access_key_id",
@@ -56,9 +57,9 @@ Here is a description of the parameters:
 
 - unload_select_sql: A SQL SELECT query that will be run on the source table
 
-- table_name: The table that will be dropped, recreated, and populated with data from the COPY command
+- destination_schema, destination_table: The table that will be dropped, recreated, and populated with data from the COPY command
 
-- create_sql: The SQL that creates the table_name table (this SQL is run to recreate the table in the step above)
+- create_sql: The SQL that creates the destination_schema.destination_table table (this SQL is run to recreate the table in the step above)
 
 - copy_data_source: This is typically `"#{unload_s3_destination}manifest"`.  The UNLOAD command automatically creates a manifest file that can be used by the COPY command to load the data.
 

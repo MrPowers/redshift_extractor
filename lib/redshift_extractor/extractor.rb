@@ -31,7 +31,10 @@ module RedshiftExtractor; class Extractor
   end
 
   def dropper
-    Drop.new(table_name: config.table_name)
+    Drop.new(
+      destination_schema: config.destination_schema,
+      destination_table: config.destination_table
+    )
   end
 
   def drop
@@ -47,7 +50,8 @@ module RedshiftExtractor; class Extractor
       aws_access_key_id: config.aws_access_key_id,
       aws_secret_access_key: config.aws_secret_access_key,
       data_source: config.copy_data_source,
-      table_name: config.table_name
+      destination_schema: config.destination_schema,
+      destination_table: config.destination_table
     )
   end
 

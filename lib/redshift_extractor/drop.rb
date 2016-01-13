@@ -1,13 +1,14 @@
 module RedshiftExtractor; class Drop
 
-  attr_reader :table_name
+  attr_reader :destination_schema, :destination_table
 
   def initialize(args)
-    @table_name = args.fetch(:table_name)
+    @destination_schema = args.fetch(:destination_schema)
+    @destination_table = args.fetch(:destination_table)
   end
 
   def drop_sql
-    "drop table if exists #{table_name};"
+    "drop table if exists #{destination_schema}.#{destination_table};"
   end
 
 end; end
