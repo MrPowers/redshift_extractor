@@ -3,6 +3,7 @@ require 'ostruct'
 require "redshift_extractor/version"
 
 require 'pg'
+require 'redshift_copier'
 
 def require_all(pattern)
   root = File.expand_path("../", File.dirname(__FILE__))

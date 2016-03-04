@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
 
   spec.add_dependency "pg", "0.18.3"
+  spec.add_dependency "redshift_copier", "0.2.0"
 end

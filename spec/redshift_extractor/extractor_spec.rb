@@ -22,8 +22,6 @@ module RedshiftExtractor; describe Extractor do
   context "#run" do
     it "unloads the data, drops the table, recreates the table, and copys the data" do
       expect(extractor).to receive(:unload).ordered
-      expect(extractor).to receive(:drop).ordered
-      expect(extractor).to receive(:create).ordered
       expect(extractor).to receive(:copy).ordered
       extractor.run
     end
@@ -52,62 +50,29 @@ module RedshiftExtractor; describe Extractor do
     end
   end
 
-  context "#dropper" do
-    it "instantiates a Drop object" do
-      args = {destination_schema: "destination_schema", destination_table: "destination_table"}
-      expect(Drop).to receive(:new).with(args)
-      extractor.send(:dropper)
-    end
-  end
-
-  context "#drop" do
-    it "runs the drop_sql in the database" do
-      destination_connection = double
-      expect(extractor).to receive(:destination_connection).and_return(destination_connection)
-      expected_sql = "drop table if exists destination_schema.destination_table;"
-      expect(destination_connection).to receive(:exec).with expected_sql
-      extractor.send(:drop)
-    end
-  end
-
-  context "#create" do
-    it "creates a database table" do
-      destination_connection = double
-      expect(extractor).to receive(:destination_connection).and_return(destination_connection)
-      expected_sql = "create_sql"
-      expect(destination_connection).to receive(:exec).with expected_sql
-      extractor.send(:create)
-    end
-  end
-
   context "#copier" do
-    it "instantiates an Copy object" do
+    it "instantiates an RedshiftCopier::Copy object" do
       args = {
-        data_source: "copy_data_source",
-        destination_schema: "destination_schema",
-        destination_table: "destination_table",
+        schema: "destination_schema",
+        table: "destination_table",
+        create_sql: "create_sql",
         aws_access_key_id: "aws_access_key_id",
-        aws_secret_access_key: "aws_secret_access_key"
+        aws_secret_access_key: "aws_secret_access_key",
+        s3_path: "copy_data_source",
+        db_config: "database_config_destination",
+        copy_command_options: "manifest dateformat 'auto' timeformat 'auto' blanksasnull emptyasnull escape gzip removequotes delimiter '|';"
       }
-      expect(Copy).to receive(:new).with(args)
+      expect(RedshiftCopier::Copy).to receive(:new).with(args)
       extractor.send(:copier)
     end
   end
 
   context "#copy" do
     it "runs the copy sql command" do
-      destination_connection = double
-      expect(extractor).to receive(:destination_connection).and_return(destination_connection)
-      expected_sql = "copy destination_schema.destination_table from 'copy_data_source' credentials 'aws_access_key_id=aws_access_key_id;aws_secret_access_key=aws_secret_access_key' manifest dateformat 'auto' timeformat 'auto' blanksasnull emptyasnull escape gzip removequotes delimiter '|';"
-      expect(destination_connection).to receive(:exec).with expected_sql
+      copier = double
+      expect(extractor).to receive(:copier).and_return copier
+      expect(copier).to receive(:run)
       extractor.send(:copy)
-    end
-  end
-
-  context "#destination_connection" do
-    it "establishes a connection with the destination database" do
-      expect(PGconn).to receive(:connect).with("database_config_destination")
-      extractor.send(:destination_connection)
     end
   end
 

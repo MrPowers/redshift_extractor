@@ -10,8 +10,6 @@ module RedshiftExtractor; class Extractor
 
   def run
     unload
-    drop
-    create
     copy
   end
 
@@ -30,37 +28,22 @@ module RedshiftExtractor; class Extractor
     source_connection.exec(unloader.unload_sql)
   end
 
-  def dropper
-    Drop.new(
-      destination_schema: config.destination_schema,
-      destination_table: config.destination_table
-    )
-  end
-
-  def drop
-    destination_connection.exec(dropper.drop_sql)
-  end
-
-  def create
-    destination_connection.exec(config.create_sql)
+  def copy
+    copier.run
   end
 
   def copier
-    Copy.new(
+    args = {
+      schema: config.destination_schema,
+      table: config.destination_table,
+      create_sql: config.create_sql,
       aws_access_key_id: config.aws_access_key_id,
       aws_secret_access_key: config.aws_secret_access_key,
-      data_source: config.copy_data_source,
-      destination_schema: config.destination_schema,
-      destination_table: config.destination_table
-    )
-  end
-
-  def copy
-    destination_connection.exec(copier.copy_sql)
-  end
-
-  def destination_connection
-    PGconn.connect(config.database_config_destination)
+      s3_path: config.copy_data_source,
+      db_config: config.database_config_destination,
+      copy_command_options: "manifest dateformat 'auto' timeformat 'auto' blanksasnull emptyasnull escape gzip removequotes delimiter '|';"
+    }
+    RedshiftCopier::Copy.new(args)
   end
 
   def source_connection
